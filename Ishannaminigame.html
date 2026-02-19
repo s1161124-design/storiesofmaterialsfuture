@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合成纖維小挑戰 · 工業與現代材料時代</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', '微軟正黑體', 'PingFang TC', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1b3b4f 0%, #2a5f7a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .game-panel {
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 25px 40px -10px rgba(0, 20, 30, 0.6);
+            overflow: hidden;
+            border: 2px solid #f4e9d8;
+            position: relative;
+        }
+        .game-header {
+            background: #d8c5a8;
+            padding: 24px 28px 18px 28px;
+            border-bottom: 4px solid #b59a7a;
+            text-align: center;
+        }
+        .game-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #1e2f3b;
+            text-shadow: 2px 2px 0 #e6d7bd;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+        .game-header .sub {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #2d4b5a;
+            background: #efe3d0;
+            display: inline-block;
+            padding: 6px 24px;
+            border-radius: 40px;
+            border: 1px solid #a48d70;
+        }
+        .quiz-area {
+            padding: 30px 30px 25px;
+            background: #fcf7ee;
+            min-height: 550px;
+            position: relative;
+        }
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-weight: 600;
+            color: #194353;
+            background: #d9e2e8;
+            padding: 10px 20px;
+            border-radius: 60px;
+            border: 1px solid #afc4cf;
+        }
+        .q-counter {
+            background: #1b4b5e;
+            color: #f2ffe6;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+        }
+        /* 分數顯示已移除 */
+        .score-badge {
+            display: none;
+        }
+        .question-box {
+            background: #ffffffc2;
+            border-radius: 32px;
+            padding: 20px 24px;
+            box-shadow: inset 0 1px 5px #00000015, 0 10px 15px -10px #2f4f5e;
+            border: 2px solid #cbae8b;
+            margin-bottom: 30px;
+            transition: opacity 0.3s;
+        }
+        .q-text {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #113946;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            word-break: break-word;
+            border-left: 7px solid #328ba8;
+            padding-left: 18px;
+        }
+        .hint-tag {
+            font-size: 1rem;
+            color: #755e3f;
+            margin-bottom: 18px;
+            background: #fff3d6;
+            padding: 5px 15px;
+            border-radius: 30px;
+            display: inline-block;
+            border: 1px solid #c9ab84;
+            opacity: 0.8;
+        }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 18px 0 12px;
+        }
+        .option-item {
+            background: #f2e5d5;
+            border-radius: 60px;
+            border: 2px solid #b5926a;
+            transition: 0.1s ease;
+            font-size: 1.3rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 0;
+            overflow: hidden;
+        }
+        .option-item:hover {
+            background: #e3d1b9;
+            border-color: #328ba8;
+            transform: scale(1.01);
+        }
+        .option-item.selected {
+            background: #b3d9e8;
+            border-color: #1b6c8c;
+            box-shadow: 0 0 0 3px #9ec3d8;
+        }
+        .option-prefix {
+            background: #5d7f8f;
+            color: white;
+            font-weight: bold;
+            min-width: 60px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border-right: 3px solid #284a5a;
+            padding: 14px 0;
+            align-self: stretch;
+        }
+        .option-label {
+            padding: 14px 20px;
+            flex: 1;
+            text-align: left;
+        }
+        .feedback-area {
+            min-height: 70px;
+            margin: 20px 0 15px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff8e3;
+            padding: 15px 22px;
+            border-radius: 50px;
+            border: 2px dashed #a48e75;
+            transition: 0.2s;
+        }
+        .emoji-badge {
+            font-size: 2.2rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .game-btn {
+            background: #e7d7bd;
+            border: 3px solid #1b4f5e;
+            color: #1b3a44;
+            padding: 16px 28px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 5px 0 #0f2e38;
+            flex: 1 1 auto;
+            min-width: 160px;
+            letter-spacing: 1px;
+        }
+        .game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #0f2e38;
+        }
+        .game-btn:disabled {
+            opacity: 0.45;
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #0f2e38;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+        .game-btn.reset-btn {
+            background: #cfdbe4;
+            border-color: #2e5770;
+            box-shadow: 0 5px 0 #1d3f4f;
+            color: #083344;
+        }
+        .game-btn.next-btn {
+            background: #c1d6d9;
+            border-color: #266480;
+            box-shadow: 0 5px 0 #124652;
+            color: #05242f;
+        }
+        .footer-note {
+            background: #d3c3aa;
+            padding: 18px;
+            text-align: center;
+            font-weight: 500;
+            color: #243b45;
+            font-size: 1.2rem;
+            border-top: 2px solid #a58d71;
+            letter-spacing: 1px;
+        }
+        
+        /* 祝賀畫面樣式 */
+        .celebration-container {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .celebration-emoji {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-15px); }
+        }
+        .celebration-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e4a5f;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 #ffd966;
+        }
+        .celebration-message {
+            font-size: 1.5rem;
+            color: #2a5f7a;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .celebration-reset-btn {
+            background: #ffb347;
+            border: 4px solid #b1440e;
+            color: #3d1e00;
+            padding: 18px 40px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 7px 0 #b1440e;
+            transition: 0.1s;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .celebration-reset-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #b1440e;
+        }
+        .hidden {
+            display: none;
+        }
+        
+        /* 右下角成就提示樣式 - 加上 🏅 圖示 */
+        .achievement-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(145deg, #f7e05e, #f9c74f);
+            padding: 18px 25px;
+            border-radius: 60px;
+            box-shadow: 0 8px 0 #b86f2c, 0 10px 20px rgba(0,0,0,0.2);
+            border: 3px solid #f9844a;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: opacity 0.5s, transform 0.3s;
+            max-width: 380px;
+            text-align: center;
+        }
+        .achievement-toast.fade-out {
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+        }
+        .toast-text {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2d1508;
+            line-height: 1.4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast-text .achievement-name {
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: #9d331f;
+            background: #fff1b8;
+            padding: 5px 18px;
+            border-radius: 40px;
+            border: 3px solid #b9582b;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        @media (max-width: 500px) {
+            .achievement-toast {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 18px;
+            }
+            .toast-text {
+                font-size: 1.3rem;
+            }
+            .toast-text .achievement-name {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-panel">
+        <div class="game-header">
+            <h1>合成纖維小挑戰</h1>
+            <div class="sub">工業與現代材料時代</div>
+        </div>
+
+        <div class="quiz-area" id="quizArea">
+            <!-- 狀態列：只保留題號 -->
+            <div class="status-row">
+                <span class="q-counter" id="questionCounter">Q1 / 3</span>
+            </div>
+
+            <!-- 問題區塊 (正常顯示) -->
+            <div class="question-box" id="questionContainer">
+                <div class="q-text" id="questionText">1. 合成纖維是從哪些原材料製成的？(可多選)</div>
+                <div class="hint-tag" id="answerHint">👇 點選選項，然後按下「檢查答案」</div>
+                
+                <div class="options-grid" id="optionsContainer"></div>
+                
+                <!-- 反饋訊息區 -->
+                <div class="feedback-area" id="feedbackMessage">
+                    <span class="emoji-badge" id="emojiBadge">🔍</span>
+                    <span id="feedbackText">點擊選項，然後按「檢查答案」</span>
+                </div>
+
+                <!-- 三個按鈕 -->
+                <div class="action-buttons">
+                    <button class="game-btn" id="checkBtn">✅ 檢查答案</button>
+                    <button class="game-btn next-btn" id="nextBtn">⏩ 下一題</button>
+                    <button class="game-btn reset-btn" id="resetBtn">🔄 重新開始</button>
+                </div>
+            </div>
+            
+            <!-- 祝賀畫面 (與問題區塊相同位置，初始隱藏) -->
+            <div class="question-box hidden" id="celebrationContainer">
+                <div class="celebration-container">
+                    <div class="celebration-emoji">🎉🏆✨</div>
+                    <div class="celebration-title">恭喜你！</div>
+                    <div class="celebration-message">你已完成所有題目！</div>
+                    <div class="celebration-reset-btn" id="celebrationResetBtn">🔄 再玩一次</div>
+                </div>
+            </div>
+            
+            <!-- 頁尾 -->
+            <div class="footer-note">
+                工業與現代材料時代
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右下角成就提示 - 加上 🏅 圖示在文字前方 -->
+    <div class="achievement-toast hidden" id="achievementToast">
+        <div class="toast-text">
+            🏅 解鎖成就：<br>
+            <span class="achievement-name">【合成纖維全制霸】</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 題庫 (選項文字)
+            const questions = [
+                {   
+                    text: "1. 合成纖維是從哪些原材料製成的？(答案可多於一個)",
+                    options: ["蠶絲", "棉", "煤", "羊毛", "石油"],
+                    correct: ["煤", "石油"],
+                    multiple: true,
+                },
+                {   
+                    text: "2. 以下哪個不是合成纖維相比天然纖維的好處？",
+                    options: ["強韌有彈性", "防污", "不易着火", "不易被熱力損壞"],
+                    correct: ["不易被熱力損壞"],
+                    multiple: false,
+                },
+                {   
+                    text: "3. 以下哪個物件不是尼龍的製成品？",
+                    options: ["風衣", "毛衣", "背包", "帳篷", "泳衣"],
+                    correct: ["毛衣"],
+                    multiple: false,
+                }
+            ];
+
+            const optionLetters = ["A", "B", "C", "D", "E"];
+
+            // 狀態
+            let currentIndex = 0;               
+            let selected = [];                   // 儲存選項文字
+            let answeredCorrectly = [false, false, false]; 
+            
+            // 記錄每題是否曾經被正確回答（用於解鎖下一題）
+            let questionUnlocked = [false, false, false];
+            
+            // 成就是否已顯示過 (避免重複彈出)
+            let achievementShown = false;
+
+            // DOM 元素
+            const questionText = document.getElementById('questionText');
+            const answerHint = document.getElementById('answerHint');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const questionCounter = document.getElementById('questionCounter');
+            const feedbackText = document.getElementById('feedbackText');
+            const feedbackMsgDiv = document.getElementById('feedbackMessage');
+            const emojiBadge = document.getElementById('emojiBadge');
+            
+            // 祝賀畫面相關元素
+            const questionContainer = document.getElementById('questionContainer');
+            const celebrationContainer = document.getElementById('celebrationContainer');
+            const celebrationResetBtn = document.getElementById('celebrationResetBtn');
+            
+            // 右下角成就提示
+            const achievementToast = document.getElementById('achievementToast');
+
+            // 更新下一題按鈕狀態
+            function updateNextButtonState() {
+                nextBtn.disabled = !questionUnlocked[currentIndex];
+            }
+
+            // 繪製選項
+            function renderOptions() {
+                const q = questions[currentIndex];
+                let htmlStr = '';
+                q.options.forEach((optText, idx) => {
+                    const letter = optionLetters[idx];
+                    const isSelected = selected.includes(optText);
+                    const selectedClass = isSelected ? 'selected' : '';
+                    htmlStr += `
+                        <div class="option-item ${selectedClass}" data-option="${optText}">
+                            <span class="option-prefix">${letter}</span>
+                            <span class="option-label">${optText}</span>
+                        </div>
+                    `;
+                });
+                optionsContainer.innerHTML = htmlStr;
+
+                document.querySelectorAll('.option-item').forEach(optDiv => {
+                    optDiv.addEventListener('click', (e) => {
+                        const optionText = optDiv.dataset.option;
+                        toggleSelection(optionText);
+                    });
+                });
+            }
+
+            // 切換選擇 (維持中性提示)
+            function toggleSelection(optionText) {
+                const q = questions[currentIndex];
+                if (q.multiple) {
+                    if (selected.includes(optionText)) {
+                        selected = selected.filter(item => item !== optionText);
+                    } else {
+                        selected.push(optionText);
+                    }
+                    selected.sort(); 
+                } else {
+                    if (selected.length === 1 && selected[0] === optionText) {
+                        selected = []; 
+                    } else {
+                        selected = [optionText]; 
+                    }
+                }
+                renderOptions();
+                setFeedback('請選擇答案，然後按「檢查答案」', 'neutral', '🔍');
+            }
+
+            // 設定 feedback 訊息 + emoji
+            function setFeedback(msg, type = 'neutral', emoji = '🔍') {
+                feedbackText.innerText = msg;
+                emojiBadge.innerText = emoji;
+                
+                if (type === 'success') {
+                    feedbackMsgDiv.style.background = '#e2f7e2';
+                    feedbackMsgDiv.style.border = '2px dashed #27843b';
+                } else if (type === 'error') {
+                    feedbackMsgDiv.style.background = '#ffe1de';
+                    feedbackMsgDiv.style.border = '2px dashed #b7472a';
+                } else if (type === 'warning') {
+                    feedbackMsgDiv.style.background = '#fff3cd';
+                    feedbackMsgDiv.style.border = '2px dashed #b58b3a';
+                } else {
+                    feedbackMsgDiv.style.background = '#fff8e3';
+                    feedbackMsgDiv.style.border = '2px dashed #a48e75';
+                }
+            }
+
+            // 顯示右下角成就提示 (現在帶有 🏅 符號)
+            function showAchievementToast() {
+                // 顯示成就提示
+                achievementToast.classList.remove('hidden');
+                achievementToast.classList.remove('fade-out');
+                
+                // 2.5秒後淡出
+                setTimeout(() => {
+                    achievementToast.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        // 隱藏成就提示
+                        achievementToast.classList.add('hidden');
+                        achievementToast.classList.remove('fade-out');
+                    }, 500);
+                }, 2500);
+            }
+
+            // 顯示祝賀畫面
+            function showCelebration(show) {
+                if (show) {
+                    questionContainer.classList.add('hidden');
+                    celebrationContainer.classList.remove('hidden');
+                    // 隱藏題號計數器
+                    questionCounter.style.opacity = '0.5';
+                } else {
+                    questionContainer.classList.remove('hidden');
+                    celebrationContainer.classList.add('hidden');
+                    questionCounter.style.opacity = '1';
+                }
+            }
+
+            // 檢查答案
+            function checkAnswer() {
+                // 未作答提示：左側圖示為 ⚠️，文字為「請先作答。」
+                if (selected.length === 0) {
+                    setFeedback('請先作答。', 'warning', '⚠️');
+                    return;
+                }
+
+                const q = questions[currentIndex];
+                const correctAnswers = q.correct;
+
+                let isCorrect = false;
+                if (selected.length === correctAnswers.length) {
+                    const sortedSelected = [...selected].sort();
+                    const sortedCorrect = [...correctAnswers].sort();
+                    isCorrect = sortedSelected.every((val, i) => val === sortedCorrect[i]);
+                }
+
+                if (isCorrect) {
+                    if (!questionUnlocked[currentIndex]) {
+                        questionUnlocked[currentIndex] = true;
+                    }
+                    // 成功訊息只顯示「正確！」
+                    setFeedback('正確！', 'success', '✅');
+                } else {
+                    setFeedback('答案不正確，再試一次吧', 'error', '❌');
+                }
+                
+                updateNextButtonState();
+            }
+
+            // 載入題目
+            function loadQuestion(index) {
+                // 先確保祝賀畫面隱藏
+                showCelebration(false);
+                
+                currentIndex = index;
+                const q = questions[index];
+                questionText.innerText = q.text;
+                answerHint.innerText = `第 ${index+1} 題 / 共 3 題`;
+
+                selected = [];
+                renderOptions();
+
+                questionCounter.innerText = `Q${index+1} / 3`;
+                setFeedback('請選擇答案，然後按「檢查答案」', 'neutral', '🔍');
+                
+                updateNextButtonState();
+            }
+
+            // 下一題
+            function nextQuestion() {
+                if (!questionUnlocked[currentIndex]) {
+                    setFeedback('⚠️ 請先正確回答本題', 'warning', '⚠️');
+                    return;
+                }
+                
+                // 如果目前是最後一題（索引2），且已解鎖
+                if (currentIndex === 2) {
+                    // 顯示成就提示 (右下角)
+                    if (!achievementShown) {
+                        achievementShown = true;
+                        showAchievementToast();
+                    }
+                    
+                    // 直接顯示祝賀畫面
+                    showCelebration(true);
+                    return;
+                }
+                
+                let newIndex = (currentIndex + 1) % questions.length;
+                selected = [];
+                loadQuestion(newIndex);
+            }
+
+            // 重設遊戲
+            function resetGame() {
+                currentIndex = 0;
+                selected = [];
+                questionUnlocked = [false, false, false];
+                achievementShown = false; // 重置成就顯示狀態
+                
+                // 確保成就提示隱藏
+                achievementToast.classList.add('hidden');
+                achievementToast.classList.remove('fade-out');
+                
+                showCelebration(false);
+                loadQuestion(0);   
+            }
+
+            // 綁定按鈕
+            checkBtn.addEventListener('click', checkAnswer);
+            nextBtn.addEventListener('click', nextQuestion);
+            resetBtn.addEventListener('click', resetGame);
+            celebrationResetBtn.addEventListener('click', resetGame);
+
+            // 初始化
+            resetGame();
+        })();
+    </script>
+</body>
+</html>
