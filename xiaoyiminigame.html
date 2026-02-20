@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青銅與鐵器時代 · 小測</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', '華文楷體', 'KaiTi', '微軟正黑體', 'Microsoft JhengHei', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1e3a2b 0%, #3b2a1c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .game-container {
+            max-width: 680px;
+            width: 100%;
+            background-color: #2b4f3b;
+            background-image: radial-gradient(circle at 20% 30%, #b35e2e22 0%, transparent 30%),
+                              radial-gradient(circle at 90% 70%, #c97c4d33 0%, transparent 35%),
+                              repeating-linear-gradient(45deg, #614a2d0c 0px, #614a2d0c 2px, #9e6b3e0c 2px, #9e6b3e0c 6px);
+            border: 8px solid #7a5e3c;
+            border-image: repeating-linear-gradient(45deg, #b77b42, #6e4e2b, #b4884e) 30;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.7), 0 0 0 2px #c2854a inset, 0 0 0 4px #4f6b4b inset;
+            border-radius: 64px 64px 48px 48px;
+            padding: 28px 24px;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 400;
+            font-size: 2.2rem;
+            letter-spacing: 6px;
+            color: #fee3c0;
+            text-shadow: 0 4px 0 #6b4226, 0 8px 8px #1f2f1a, 0 0 12px #f5ac78;
+            margin-bottom: 18px;
+            word-break: keep-all;
+            border-bottom: 3px double #c47e5a;
+            padding-bottom: 8px;
+            font-family: '華文楷體', 'KaiTi', serif;
+        }
+
+        .progress-badge {
+            background: #402e1b;
+            color: #fddbb4;
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid #bf8f60;
+            box-shadow: 0 0 0 2px #4f3923;
+            margin-bottom: 28px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(2px);
+            background-color: #3b2e1ee0;
+        }
+
+        .question-card {
+            background: #354d33dd;
+            background: linear-gradient(165deg, #314f33 0%, #562f1f 180%);
+            border: 3px solid #c1804b;
+            border-radius: 60px 60px 40px 40px;
+            padding: 32px 24px 36px 24px;
+            box-shadow: 0 0 0 4px #735c39, 0 16px 20px #00000055, inset 0 -4px 8px #261a0e, inset 0 4px 6px #eb9d6340;
+            backdrop-filter: blur(1px);
+            color: #ffefda;
+            transition: background 0.2s;
+            margin-bottom: 28px;
+        }
+
+        .question-text {
+            font-size: 1.7rem;
+            font-weight: 500;
+            line-height: 1.4;
+            text-shadow: 2px 2px 0 #4a3622;
+            margin-bottom: 24px;
+            border-left: 8px solid #e98a49;
+            padding-left: 22px;
+            font-family: '華文楷體', 'KaiTi', serif;
+        }
+
+        .options-area {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .option-item {
+            background: #2f3e2bb0;
+            border: 2px solid #a76f42;
+            border-radius: 60px;
+            padding: 14px 24px;
+            font-size: 1.3rem;
+            color: #fcead3;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 5px 0 #3b281a, 0 6px 12px black;
+            transition: all 0.1s ease;
+            border-bottom: 4px solid #704e2d;
+        }
+
+        .option-item:hover:not(.disabled-option) {
+            background: #4f6843;
+            border-color: #e59c5a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #3b281a, 0 10px 18px black;
+        }
+
+        .option-item.selected {
+            background: #bc6c3c;
+            border-color: #ffcf8c;
+            box-shadow: 0 0 0 3px #ffb46b, 0 5px 0 #6f3f1b;
+            color: #190e04;
+            font-weight: bold;
+            text-shadow: 0 1px 2px #ffb888;
+        }
+
+        .prefix {
+            background-color: #78522e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #ffdbb0;
+            border: 2px solid #d19449;
+            box-shadow: inset 0 -2px 3px #382615;
+            font-size: 1.4rem;
+        }
+
+        .option-item.selected .prefix {
+            background-color: #d67e38;
+            color: #2d1b0b;
+            border-color: #ffddb0;
+        }
+
+        .multi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .multi-item {
+            background: #2d402ac0;
+            border: 2px solid #b77a42;
+            border-radius: 40px;
+            padding: 16px 8px 16px 16px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 5px 0 #3e2a1a;
+            transition: 0.08s linear;
+            border-bottom: 4px solid #75522d;
+            color: #f9e9cf;
+        }
+
+        .multi-item:hover {
+            background: #4e7042;
+            border-color: #e69848;
+            transform: scale(0.99);
+        }
+
+        .multi-item.selected-multi {
+            background: #b75f2c;
+            border-color: #fec28b;
+            box-shadow: 0 0 0 3px #fec28b, 0 5px 0 #793f17;
+            color: #130900;
+            font-weight: 500;
+        }
+
+        /* 簡化多選框：移除特殊符號，使用標準勾選樣式 */
+        .checkbox-fake {
+            width: 32px;
+            height: 32px;
+            background-color: #292818;
+            border: 3px solid #b9773d;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #e0873a;
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: inset 0 -3px 2px #100a05;
+            transition: 0.1s;
+        }
+
+        .selected-multi .checkbox-fake {
+            background-color: #b45f2a;
+            border-color: #fed7a1;
+            color: #3b1e06;
+            box-shadow: none;
+        }
+
+        /* 移除特殊字符，選中時顯示標準的 ✓ */
+        .checkbox-fake::after {
+            content: "";
+        }
+
+        .selected-multi .checkbox-fake::after {
+            content: "✓";
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffdaa0;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0 8px;
+        }
+
+        button {
+            background: #693d20;
+            border: none;
+            border-bottom: 6px solid #3a281b;
+            color: #ffe7c8;
+            font-size: 1.5rem;
+            padding: 12px 20px;
+            min-width: 130px;
+            border-radius: 60px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #321f12, 0 10px 20px black;
+            transition: 0.08s linear;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 2px solid #d49452;
+            font-family: '華文楷體', 'KaiTi', serif;
+        }
+
+        button:hover:not(:disabled) {
+            background: #975a2e;
+            transform: translateY(-3px);
+            box-shadow: 0 11px 0 #321f12, 0 14px 24px black;
+            border-color: #f5b776;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #321f12, 0 6px 12px black;
+            border-bottom-width: 2px;
+        }
+
+        button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            border-bottom: 6px solid #3f2d1f;
+            transform: none;
+            box-shadow: 0 5px 0 #2b1d12;
+            background: #514136;
+        }
+
+        .check-btn {
+            background: #8b4f2a;
+            border-color: #e79a4b;
+        }
+
+        .redo-btn {
+            background: #572e1b;
+            border-color: #c96529;
+        }
+
+        .feedback-msg {
+            margin-top: 24px;
+            font-size: 1.5rem;
+            text-align: center;
+            color: #fad396;
+            min-height: 3.5rem;
+            text-shadow: 0 2px 2px #231709;
+            padding: 8px;
+            border-top: 2px dashed #ad7645;
+            border-bottom: 2px dashed #ad7645;
+            background-color: #1e392a60;
+            border-radius: 60px;
+            letter-spacing: 0.5px;
+        }
+
+        .fire-footer {
+            text-align: right;
+            font-size: 1.8rem;
+            opacity: 0.25;
+            margin-top: -5px;
+            margin-bottom: -10px;
+            pointer-events: none;
+            color: #c57239;
+        }
+
+        hr {
+            border: none;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #bd7f47, #ce8e52, #bd7f47, transparent);
+            margin: 20px 0 6px;
+        }
+
+        @media (max-width: 550px) {
+            .game-container { padding: 16px; }
+            .question-text { font-size: 1.4rem; }
+            .option-item { font-size: 1.1rem; }
+            .multi-grid { grid-template-columns: 1fr; }
+            button { font-size: 1.3rem; padding: 10px 16px; min-width: 110px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <!-- 標題更新為「青銅與鐵器時代」 -->
+    <h1>⚔️ 青銅與鐵器時代 ⚔️</h1>
+    <div class="progress-badge" id="progressDisplay">第 1 / 4 題</div>
+
+    <!-- 動態題目區 -->
+    <div id="quizArea" class="question-card"></div>
+
+    <!-- 按鈕組 -->
+    <div class="action-bar">
+        <button id="checkBtn" class="check-btn">🔍 檢查答案</button>
+        <button id="nextBtn" class="next-btn">⏩ 下一題</button>
+        <button id="redoBtn" class="redo-btn">🔄 重做</button>
+    </div>
+
+    <!-- 反饋區 -->
+    <div id="feedbackMessage" class="feedback-msg"></div>
+
+    <hr>
+    <div class="fire-footer">🔥</div>
+</div>
+
+<script>
+    (function() {
+        // 題庫 (繁體)
+        const questions = [
+            {
+                text: "1. 青銅器是我國古代非常重要的金屬器物，古人會用它來生活、祭祀和打仗。",
+                type: "true-false",
+                correct: "是",
+                options: ["是", "否"]
+            },
+            {
+                text: "2. 在古代，青銅鼎最主要的用途是？",
+                type: "single",
+                correct: "B",
+                options: ["A. 用來玩遊戲", "B. 煮飯、祭祀、盛食物", "C. 用來寫字畫畫"]
+            },
+            {
+                text: "3. 我國古代，先被製造和使用的是？",
+                type: "single",
+                correct: "A",
+                options: ["A. 青銅器", "B. 鐵器", "C. 塑膠器具"]
+            },
+            {
+                text: "4. 下面哪些屬於青銅器／鐵器的用途？ （可多選）",
+                type: "multiple",
+                correct: ["A", "B", "C", "D"],
+                options: ["製作農具，幫助種地", "製作兵器，保衛家園", "製作禮器，用於祭祀", "製作餐具，方便生活"],
+                optionKeys: ["A", "B", "C", "D"]
+            }
+        ];
+
+        // 當前索引、使用者選擇、正確檢查標記
+        let currentIdx = 0;
+        let userSelections = questions.map(() => null);
+        let checkedCorrect = questions.map(() => false);
+
+        // DOM 元素
+        const quizArea = document.getElementById('quizArea');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const nextBtn = document.getElementById('nextBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const feedbackDiv = document.getElementById('feedbackMessage');
+
+        function currentQuestion() {
+            return questions[currentIdx];
+        }
+
+        // 判斷某題是否正確
+        function isAnswerCorrect(idx) {
+            const q = questions[idx];
+            const userAns = userSelections[idx];
+            if (userAns === null || userAns === undefined) return false;
+            if (q.type === "multiple") {
+                if (!Array.isArray(userAns)) return false;
+                const correctArray = q.correct;
+                if (userAns.length !== correctArray.length) return false;
+                const sortedUser = [...userAns].sort();
+                const sortedCorrect = [...correctArray].sort();
+                return sortedUser.every((val, i) => val === sortedCorrect[i]);
+            } else {
+                return userAns === q.correct;
+            }
+        }
+
+        // 檢查並更新 checkedCorrect
+        function validateCurrentAndMark() {
+            const correct = isAnswerCorrect(currentIdx);
+            checkedCorrect[currentIdx] = correct;
+            return correct;
+        }
+
+        // 是否所有題都正確
+        function allQuestionsCorrect() {
+            for (let i = 0; i < questions.length; i++) {
+                if (!isAnswerCorrect(i)) return false;
+            }
+            return true;
+        }
+
+        // 渲染當前題目
+        function renderQuestion() {
+            const q = currentQuestion();
+            let html = `<div class="question-text">${q.text}</div>`;
+            html += `<div class="options-area" id="optionsContainer">`;
+
+            if (q.type === "true-false") {
+                q.options.forEach(opt => {
+                    const isSelected = (userSelections[currentIdx] === opt);
+                    html += `
+                        <div class="option-item ${isSelected ? 'selected' : ''}" data-value="${opt}">
+                            <span class="prefix"></span>
+                            <span>${opt}</span>
+                        </div>
+                    `;
+                });
+            } else if (q.type === "single") {
+                q.options.forEach((optText, idx) => {
+                    const letter = String.fromCharCode(65 + idx);
+                    const isSelected = (userSelections[currentIdx] === letter);
+                    html += `
+                        <div class="option-item ${isSelected ? 'selected' : ''}" data-value="${letter}">
+                            <span class="prefix"></span>
+                            <span>${optText}</span>
+                        </div>
+                    `;
+                });
+            } else if (q.type === "multiple") {
+                html += `<div class="multi-grid" id="multiContainer">`;
+                q.options.forEach((optText, idx) => {
+                    const letter = q.optionKeys[idx];
+                    const selectedArray = userSelections[currentIdx] || [];
+                    const isSelected = Array.isArray(selectedArray) && selectedArray.includes(letter);
+                    html += `
+                        <div class="multi-item ${isSelected ? 'selected-multi' : ''}" data-value="${letter}">
+                            <span class="checkbox-fake"></span>
+                            <span>${optText}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            quizArea.innerHTML = html;
+
+            // 綁定事件
+            if (q.type === "multiple") {
+                document.querySelectorAll('#multiContainer .multi-item').forEach(item => {
+                    item.addEventListener('click', (e) => handleMultiClick(e.currentTarget));
+                });
+            } else {
+                document.querySelectorAll('.option-item').forEach(item => {
+                    item.addEventListener('click', (e) => handleSingleClick(e.currentTarget));
+                });
+            }
+
+            progressDisplay.innerText = `第 ${currentIdx + 1} / 4 題`;
+
+            // 設定提示訊息 - 加入指定圖示
+            if (checkedCorrect[currentIdx]) {
+                feedbackDiv.innerText = '☑️ 正確！';
+            } else {
+                feedbackDiv.innerText = '⚔️ 請選擇答案，然後按「檢查答案」。';
+            }
+
+            // 調整下一題按鈕文字：如果是最後一題且已答對，顯示「完成」，否則顯示「下一題」
+            if (currentIdx === questions.length - 1 && checkedCorrect[currentIdx]) {
+                nextBtn.innerText = '🎉 完成';
+            } else {
+                nextBtn.innerText = '⏩ 下一題';
+            }
+
+            // 下一題按鈕啟用條件：只有當前題目 checkedCorrect 為 true 才可用
+            nextBtn.disabled = !checkedCorrect[currentIdx];
+        }
+
+        // 單選/是非點擊
+        function handleSingleClick(target) {
+            const value = target.getAttribute('data-value');
+            userSelections[currentIdx] = value;
+            checkedCorrect[currentIdx] = false;   // 修改答案後必須重新檢查
+            renderQuestion();
+        }
+
+        // 多選點擊
+        function handleMultiClick(target) {
+            const letter = target.getAttribute('data-value');
+            let currentMulti = userSelections[currentIdx];
+            if (!currentMulti || !Array.isArray(currentMulti)) {
+                currentMulti = [];
+            } else {
+                currentMulti = [...currentMulti];
+            }
+
+            if (currentMulti.includes(letter)) {
+                currentMulti = currentMulti.filter(v => v !== letter);
+            } else {
+                currentMulti.push(letter);
+            }
+            currentMulti.sort();
+            userSelections[currentIdx] = currentMulti;
+            checkedCorrect[currentIdx] = false;
+            renderQuestion();
+        }
+
+        // 檢查答案按鈕
+        function handleCheck() {
+            const ans = userSelections[currentIdx];
+            
+            // 完全沒有選擇任何答案
+            if (!ans || (Array.isArray(ans) && ans.length === 0)) {
+                feedbackDiv.innerText = '⚔️ 請先作答。';
+                return;
+            }
+
+            const correct = validateCurrentAndMark();
+            renderQuestion();  // 重新渲染以更新 nextBtn 狀態與按鈕文字
+            if (correct) {
+                feedbackDiv.innerText = '☑️ 正確！';
+            } else {
+                feedbackDiv.innerText = '⚔️ 答案不正確，再試一次吧';
+            }
+        }
+
+        // 下一題 / 完成
+        function handleNext() {
+            if (!checkedCorrect[currentIdx]) {
+                feedbackDiv.innerText = '⚔️ 請先檢查答案並且答對才能繼續。';
+                return;
+            }
+
+            if (currentIdx === questions.length - 1) {
+                // 最後一題，且正確，顯示完成訊息
+                feedbackDiv.innerText = '🎉 恭喜你完成所有題目！';
+                return;
+            }
+
+            currentIdx++;
+            renderQuestion();
+        }
+
+        // 重做
+        function redoQuiz() {
+            userSelections = questions.map(() => null);
+            checkedCorrect = questions.map(() => false);
+            currentIdx = 0;
+            renderQuestion();
+            // renderQuestion 已包含預設訊息，但確保顯示引導語
+            feedbackDiv.innerText = '⚔️ 請選擇答案，然後按「檢查答案」。';
+        }
+
+        // 綁定事件
+        checkBtn.addEventListener('click', handleCheck);
+        nextBtn.addEventListener('click', handleNext);
+        redoBtn.addEventListener('click', redoQuiz);
+
+        // 初始化
+        renderQuestion();
+    })();
+</script>
+</body>
+</html>
